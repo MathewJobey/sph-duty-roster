@@ -1,3 +1,7 @@
+
+
+
+
 # SPH Duty Roster Engine 🏥
 
 A personal Google Sheets script tool built to replace manual calendar scheduling with an automated rotation engine. Although the template itself is tailored to a specific roster format, the core architecture and optimization algorithms can be repurposed by anyone looking to build constraint-based scheduling systems.
@@ -14,7 +18,7 @@ A personal Google Sheets script tool built to replace manual calendar scheduling
 
 ---
 <kbd>
-  <video src="workflow.mp4" autoplay loop muted playsinline width="100%"></video>
+  <video src="https://github.com/user-attachments/assets/78891037-a181-4d82-9547-5f690d38b582" autoplay loop muted playsinline width="100%"></video>
 </kbd>
 
 ---
