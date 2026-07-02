@@ -1,6 +1,6 @@
-# SPH Duty Roster Scripts 🏥
+# SPH Duty Roster Engine 🏥
 
-A Google Apps Script utility tailored to automate and optimize monthly on-call rotations for surgical residents at SPH. It replaces manual scheduling layouts with a randomized, constraint-based balancing script.
+A personal Google Sheets script tool built to replace manual calendar scheduling with an automated rotation engine. Although the template itself is tailored to a specific roster format, the core architecture and optimization algorithms can be repurposed by anyone looking to build constraint-based scheduling systems.
 
 ---
 
@@ -13,6 +13,13 @@ A Google Apps Script utility tailored to automate and optimize monthly on-call r
 * **Interactive Frontend Modals:** Instead of typing directly into the spreadsheet, shifts are managed through clean popup windows. These windows act as a safety gate—instantly catching typos, missing entries, or accidental double-bookings before anything changes on the main sheet.
 
 ---
+
+---
+
+## 🔄 Logic Workflow
+
+Here is the step-by-step execution path the script follows when generating a new roster:
+
 
 ---
 
