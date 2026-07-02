@@ -13,12 +13,16 @@ A personal Google Sheets script tool built to replace manual calendar scheduling
 * **Interactive Frontend Modals:** Instead of typing directly into the spreadsheet, shifts are managed through clean popup windows. These windows act as a safety gate—instantly catching typos, missing entries, or accidental double-bookings before anything changes on the main sheet.
 
 ---
+<kbd>
+  <video src="workflow.mp4" autoplay loop muted playsinline width="100%"></video>
+</kbd>
 
 ---
 
 ## 🔄 Logic Workflow
 
 Here is the step-by-step execution path the script follows when generating a new roster:
+<img width="1024" height="1536" alt="logicflow" src="https://github.com/user-attachments/assets/21bb3f63-5460-4cb8-a102-28782237286d" />
 
 
 ---
