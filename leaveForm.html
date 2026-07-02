@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      body { font-family: 'Roboto', Arial, sans-serif; padding: 15px; background-color: #f8f9fa; color: #3c4043; }
+      .instruction { font-size: 13px; color: #5f6368; margin-bottom: 16px; line-height: 1.4; }
+      .scroll-container { max-height: 260px; overflow-y: auto; background: #ffffff; border: 1px solid #dadce0; border-radius: 8px; padding: 10px; }
+      .form-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px dashed #f1f3f4; }
+      .day-label { font-weight: bold; font-size: 13px; width: 100px; color: #1a73e8; }
+      input[type="text"] { width: 240px; padding: 6px 10px; border: 1px solid #dadce0; border-radius: 4px; font-size: 13px; text-align: center; }
+      .button-bar { display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px; }
+      button { padding: 8px 16px; border: none; border-radius: 4px; font-size: 13px; font-weight: bold; cursor: pointer; }
+      .btn-submit { background-color: #1a73e8; color: white; }
+      .btn-cancel { background-color: #e8eaed; color: #3c4043; }
+    </style>
+  </head>
+  <body>
+
+    <div class="instruction">
+      Enter leave dates as numbers separated by commas for the active <b><?= listType ?></b> roster.<br>
+      Example: <b>5, 12, 13</b> (Leave blank if no leaves)
+    </div>
+    
+    <div class="scroll-container">
+      <? for (var i = 0; i < allowedNames.length; i++) { 
+           var name = allowedNames[i];
+      ?>
+        <div class="form-row">
+          <span class="day-label">👤 <?= name ?></span>
+          <input type="text" class="leave-input" data-name="<?= name ?>" placeholder="e.g. 5, 12, 13">
+        </div>
+      <? } ?>
+    </div>
+    
+    <div class="button-bar">
+      <button class="btn-cancel" onclick="google.script.host.close()">Cancel</button>
+      <button class="btn-submit" onclick="submitLeaveForm()">Next: Weekend Shifts</button>
+    </div>
+
+    <script>
+      function submitLeaveForm() {
+        var inputs = document.querySelectorAll('.leave-input');
+        var payload = {};
+        
+        inputs.forEach(function(inputField) {
+          var nameKey = inputField.getAttribute('data-name');
+          payload[nameKey] = inputField.value;
+        });
+        
+        document.querySelector('.btn-submit').disabled = true;
+        document.querySelector('.btn-submit').innerText = "Saving Leaves...";
+        
+        google.script.run
+          .withSuccessHandler(function(response) {
+             if (response === "SUCCESS") {
+               // Automatically chain directly to opening the weekend panel
+               google.script.run.triggerWeekendFormLaunch();
+               setTimeout(function() { google.script.host.close(); }, 150);
+             }
+          })
+          .processLeaveForm(payload);
+      }
+    </script>
+  </body>
+</html>
