@@ -1,4 +1,4 @@
-// This function builds the grid visual layout using the answers passed to it
+// Function 3: Builds the grid visual layout using the calendar variables passed to it
 function buildSpreadsheetLayout(listType, fullMonthName, inputMonth, inputYear) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
@@ -10,15 +10,15 @@ function buildSpreadsheetLayout(listType, fullMonthName, inputMonth, inputYear) 
   // Step 2: Create a short 2-digit year text string with an apostrophe (e.g., '26)
   var yearText = "'" + (inputYear - 2000);
   
-  // Step 3: Execute File Renaming (Updated to use '26)
-  var fileName = fullMonthName + "_" + yearText + "-" + "Plastic_Surgery" + "-" + listType + "_Duty_List-Specialists'_Hospital";
+  // Step 3: Execute File Renaming (Updated to use SPH privacy indicator)
+  var fileName = fullMonthName + "_" + yearText + "-" + "Plastic_Surgery" + "-" + listType + "_Duty_List-SPH";
   spreadsheet.setName(fileName);
   
   // Step 4: Build the Main Large Heading (Print-Optimized Visual Hierarchy)
   var mainTitle = fullMonthName + " " + yearText + " " + "Plastic Surgery" + " " + listType + " Duty List";
-  var locationTitle = "Specialists' Hospital, Kochi";
+  var locationTitle = "SPH";
   
-  // Row 1 Setup: The large dominant title
+  // Row 1 Setup: The large dominant title banner
   sheet.getRange("A1").setValue(mainTitle);
   sheet.getRange("A1:D1").merge();
   sheet.getRange("A1").setFontSize(14).setFontWeight("bold").setHorizontalAlignment("center"); 
@@ -59,32 +59,32 @@ function buildSpreadsheetLayout(listType, fullMonthName, inputMonth, inputYear) 
       sheet.getRange(row, 1, 1, 2).setBackground(weekendColor);
     }
     
-    // --- PRINT UPGRADE: Set data row heights to be luxuriously tall ---
+    // Set data row heights to be tall and readable for printing
     sheet.setRowHeight(row, 28); 
   }
   
-  // --- PRINT UPGRADE: Set custom row heights for the top headers ---
+  // Step 7: Set custom row heights for the top titles and column headers
   sheet.setRowHeight(1, 35); // Main Title Row
   sheet.getRange("A1").setVerticalAlignment("middle");
   
   sheet.setRowHeight(2, 22); // Subtitle Row
   sheet.getRange("A2").setVerticalAlignment("middle");
   
-  sheet.setRowHeight(3, 15); // Spacer Row
+  sheet.setRowHeight(3, 15); // Blank Spacer Row
   
   sheet.setRowHeight(4, 30); // Column Headers Row
   sheet.getRange("A4:D4").setVerticalAlignment("middle").setFontSize(11);
   
-  // --- PRINT UPGRADE: Set explicit generous column widths to fill A4 width ---
-  sheet.setColumnWidth(1, 120); // Date Column
-  sheet.setColumnWidth(2, 120);  // Day Column
-  sheet.setColumnWidth(3, 120); // 1st Call Column
-  sheet.setColumnWidth(4, 120); // 2nd Call Column
+  // Step 8: Set explicit column widths to perfectly fit standard paper dimensions
+  sheet.setColumnWidth(1, 120); // Date Column width in pixels
+  sheet.setColumnWidth(2, 120); // Day Column width in pixels
+  sheet.setColumnWidth(3, 120); // 1st Call Column width in pixels
+  sheet.setColumnWidth(4, 120); // 2nd Call Column width in pixels
   
-  // Step 7: Center all columns and rows nicely
+  // Step 9: Center align all text columns nicely across the dataset grid
   sheet.getRange(1, 1, daysInMonth + 4, 4).setHorizontalAlignment("center");
   SpreadsheetApp.flush();
 
-  // Trigger the new resident collector at the end of the layout build
+  // Trigger the next automated routing function to collect resident roster metrics
   setupResidentsAndColors(listType);
 }
