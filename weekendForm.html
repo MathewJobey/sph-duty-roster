@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      body { 
+        font-family: 'Roboto', Arial, sans-serif; 
+        padding: 15px 15px 5px 15px; 
+        background-color: #f8f9fa; 
+        color: #3c4043; 
+      }
+      
+      .instruction { 
+        font-size: 13px; 
+        color: #5f6368; 
+        margin-bottom: 8px; 
+        line-height: 1.4; 
+      }
+
+      .staff-alert {
+        font-size: 12px;
+        background-color: #e8f0fe; 
+        color: #1a73e8; 
+        padding: 6px 10px;
+        border-radius: 6px;
+        margin-bottom: 6px;
+        border: 1px solid #c2e7ff;
+      }
+
+      .leaves-alert {
+        font-size: 11px;
+        background-color: #feefc3; 
+        color: #b06000; 
+        padding: 6px 10px;
+        border-radius: 6px;
+        margin-bottom: 12px;
+        border: 1px solid #fde293;
+        line-height: 1.3;
+      }
+      
+      .scroll-container { max-height: 200px; overflow-y: auto; background: #ffffff; border: 1px solid #dadce0; border-radius: 8px; padding: 10px; }
+      
+      .form-row { 
+        display: flex; 
+        align-items: center; 
+        justify-content: space-between; 
+        margin-bottom: 4px;   
+        padding-bottom: 4px;  
+      }
+      
+      .day-label { font-weight: bold; font-size: 13px; width: 120px; }
+      .sat-style { color: #1a73e8; } 
+      .sun-style { color: #d93025; } 
+      input[type="text"] { width: 220px; padding: 6px 10px; border: 1px solid #dadce0; border-radius: 4px; font-size: 13px; text-transform: uppercase; text-align: center; font-weight: bold; }
+      input[type="text"]:focus { border-color: #1a73e8; outline: none; background-color: #f1f3f4; }
+      .button-bar { display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px; }
+      button { padding: 8px 16px; border: none; border-radius: 4px; font-size: 13px; font-weight: bold; cursor: pointer; }
+      .btn-submit { background-color: #1a73e8; color: white; }
+      .btn-submit:hover { background-color: #1557b0; }
+      .btn-cancel { background-color: #e8eaed; color: #3c4043; }
+      .btn-cancel:hover { background-color: #dadce0; }
+
+      .sunday-space {
+        margin-bottom: 24px; 
+        border-bottom: 1px solid #e8eaed; 
+        padding-bottom: 10px; 
+      }
+
+      .audit-alert-box {
+        background-color: #e6f4ea;
+        border: 1px solid #34a853;
+        color: #137333;
+        padding: 8px 10px;
+        border-radius: 6px;
+        margin-bottom: 8px;
+        font-size: 12px;
+        font-weight: bold;
+      }
+      .audit-alert-box.warn {
+        background-color: #fce8e6;
+        border: 1px solid #ea4335;
+        color: #c5221f;
+      }
+      .audit-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 12px;
+        background: #ffffff;
+        border-radius: 6px;
+        overflow: hidden;
+        border: 1px solid #dadce0;
+      }
+      .audit-table th { background-color: #f1f3f4; font-weight: bold; padding: 6px; font-size: 11px; border-bottom: 2px solid #dadce0; text-align: center; }
+      .audit-table td { padding: 6px; font-size: 12px; border-bottom: 1px solid #f1f3f4; text-align: center; font-weight: bold; }
+    </style>
+  </head>
+  <body>
+
+    <div id="top-audit-dock" style="display: none;">
+      <div id="audit-status-message" class="audit-alert-box"></div>
+      <table class="audit-table">
+        <thead>
+          <tr>
+            <th>Staff Member</th>
+            <th>Weekend 1st</th>
+            <th>Weekend 2nd</th>
+            <th>Total Weekend</th>
+          </tr>
+        </thead>
+        <tbody id="audit-table-rows"></tbody>
+      </table>
+    </div>
+
+    <div class="instruction">
+      Enter names separated by a comma. Example: <b>ABJ, ANJ</b> (1st Call, 2nd Call)
+    </div>
+
+    <div class="staff-alert">
+      Active <b><?= listType ?></b> Team: &nbsp;<code><?= allowedNames ?></code>
+    </div>
+
+    <div class="leaves-alert">
+      📅 <b>Recorded Leaves:</b><br>
+      <?!= visualLeaves ?>
+    </div>
+    
+    <div class="scroll-container">
+      <? for (var i = 0; i < weekends.length; i++) { 
+           var day = weekends[i];
+           var styleClass = (day.dayName === "SAT") ? "sat-style" : "sun-style";
+           var separationClass = (day.dayName === "SUN") ? "sunday-space" : "";
+      ?>
+        <div class="form-row <?= separationClass ?>" data-row="<?= day.row ?>" data-dayname="<?= day.dayName ?>" data-datenum="<?= day.dateNum ?>">
+          <span class="day-label <?= styleClass ?>">
+            <?= day.dayName ?> &nbsp;<?= day.dateNum ?>
+          </span>
+          <input type="text" class="shift-input" placeholder="1st Call, 2nd Call">
+        </div>
+      <? } ?>
+    </div>
+    
+    <div class="button-bar" id="primary-action-bar">
+      <button class="btn-cancel" onclick="google.script.host.close()">Cancel</button>
+      <button class="btn-submit" onclick="validateAndCalculateWeekends()">Check & Save</button>
+    </div>
+
+    <div class="button-bar" id="confirm-action-bar" style="display: none; background-color: #f1f3f4; padding: 8px; border-radius: 6px;">
+      <button class="btn-cancel" style="background-color: #fce8e6; color: #c5221f;" onclick="hideTopAuditBanner()">← Re-edit Rows</button>
+      <button class="btn-submit" style="background-color: #34a853;" onclick="executeFinalFormSave()">Confirm & Save Shifts</button>
+    </div>
+
+    <script>
+      var globalLeaveMapping = <?!= leavesJSON ?>;
+      var activeStaffKeys = "<?= allowedNames ?>".split(', ');
+      var validatedPayloadCache = []; 
+
+      function validateAndCalculateWeekends() {
+        var rowsList = document.querySelectorAll('.form-row');
+        var payload = [];
+        
+        var weekendTally = {};
+        activeStaffKeys.forEach(function(name) {
+          weekendTally[name] = { firsts: 0, seconds: 0 };
+        });
+        
+        for (var i = 0; i < rowsList.length; i++) {
+          var rowElement = rowsList[i];
+          var inputField = rowElement.querySelector('.shift-input');
+          var textVal = inputField.value.trim();
+          
+          var dayName = rowElement.getAttribute('data-dayname');
+          var dateNum = rowElement.getAttribute('data-datenum');
+          var dateInt = parseInt(dateNum, 10);
+          
+          if (textVal === "") {
+            alert("⚠️ Missing Weekend Shift!\n\nPlease fill out every single weekend row before reviewing totals.\n\nCheck empty box on: " + dayName + " " + dateNum);
+            inputField.focus();
+            return;
+          }
+          
+          var parts = textVal.split(',');
+          
+          if (parts.length !== 2) {
+            alert("⚠️ Formatting Error!\n\nRow " + dayName + " " + dateNum + " must contain two initials separated by a single comma.\n\nExample: ABJ, ANJ");
+            inputField.focus();
+            return;
+          }
+          
+          var doc1 = parts[0].trim().toUpperCase();
+          var doc2 = parts[1].trim().toUpperCase();
+          
+          if (activeStaffKeys.indexOf(doc1) === -1 || activeStaffKeys.indexOf(doc2) === -1) {
+            alert("⚠️ Unrecognized Staff Code!\n\nOne or both entries on " + dayName + " " + dateNum + " do not match the authorized code names checklist.");
+            inputField.focus();
+            return;
+          }
+          
+          // Soft Double-Booking Override Gate
+          if (doc1 === doc2) {
+            var itsFine = confirm("⚠️ Double Booking Noted!\n\n" + doc1 + " is assigned to both 1st and 2nd call on " + dayName + " " + dateNum + ".\n\nIs this okay? Click [OK] if 'It's fine', or [Cancel] to go back and edit.");
+            if (itsFine === false) {
+              inputField.focus();
+              return;
+            }
+          }
+          
+          var doc1Leaves = globalLeaveMapping[doc1] || [];
+          if (doc1Leaves.indexOf(dateInt) !== -1) {
+            alert("⚠️ Leave Conflict Detected!\n\n" + doc1 + " requested leave on " + dayName + " " + dateNum + ".");
+            inputField.focus();
+            return;
+          }
+          
+          var doc2Leaves = globalLeaveMapping[doc2] || [];
+          if (doc2Leaves.indexOf(dateInt) !== -1) {
+            alert("⚠️ Leave Conflict Detected!\n\n" + doc2 + " requested leave on " + dayName + " " + dateNum + ".");
+            inputField.focus();
+            return;
+          }
+          
+          if (weekendTally[doc1]) weekendTally[doc1].firsts++;
+          if (weekendTally[doc2]) weekendTally[doc2].seconds++;
+          
+          payload.push({
+            row: parseInt(rowElement.getAttribute('data-row'), 10),
+            dayName: dayName,
+            dateNum: dateNum,
+            textInput: textVal
+          });
+        }
+        
+        validatedPayloadCache = payload;
+        showTopAuditBanner(weekendTally);
+      }
+
+      function showTopAuditBanner(finalTally) {
+        var tableBody = document.getElementById('audit-table-rows');
+        tableBody.innerHTML = ""; 
+        
+        var isPerfectlyEqual = true;
+        var standardFirstCount = null;
+        var standardSecondCount = null;
+        
+        for (var staffName in finalTally) {
+          var fCall = finalTally[staffName].firsts;
+          var sCall = finalTally[staffName].seconds;
+          var total = fCall + sCall;
+          
+          if (standardFirstCount === null) {
+            standardFirstCount = fCall;
+            standardSecondCount = sCall;
+          } else {
+            if (fCall !== standardFirstCount || sCall !== standardSecondCount) {
+              isPerfectlyEqual = false;
+            }
+          }
+          
+          var rowHTML = "<tr>" +
+              "<td>" + staffName + "</td>" +
+              "<td>" + fCall + "</td>" +
+              "<td>" + sCall + "</td>" +
+              "<td style='background-color: #f8f9fa; color: #1a73e8;'>" + total + "</td>" +
+            "</tr>";
+          tableBody.innerHTML += rowHTML;
+        }
+        
+        var banner = document.getElementById('audit-status-message');
+        if (isPerfectlyEqual === true) {
+          banner.className = "audit-alert-box";
+          banner.innerHTML = "✨ Perfect Weekend Split! Baseline shift metrics match beautifully.";
+        } else {
+          banner.className = "audit-alert-box warn";
+          banner.innerHTML = "⚖️ Weekend Balance Warning! Shifts are uneven. (The weekday engine will fix this balance later!)";
+        }
+        
+        document.getElementById('top-audit-dock').style.display = 'block';
+        document.getElementById('primary-action-bar').style.display = 'none';
+        document.getElementById('confirm-action-bar').style.display = 'flex';
+      }
+
+      function hideTopAuditBanner() {
+        document.getElementById('top-audit-dock').style.display = 'none';
+        document.getElementById('confirm-action-bar').style.display = 'none';
+        document.getElementById('primary-action-bar').style.display = 'flex';
+      }
+
+      function executeFinalFormSave() {
+        var submitBtn = document.querySelector('#confirm-action-bar .btn-submit');
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Processing...";
+        
+        google.script.run
+          .withSuccessHandler(function(serverMessage) { 
+             if (serverMessage === "SUCCESS") {
+               google.script.run.startWeekdayPhase();
+               setTimeout(function() {
+                 google.script.host.close();
+               }, 150); 
+             }
+          })
+          .processFormSubmission(validatedPayloadCache);
+      }
+    </script>
+  </body>
+</html>
